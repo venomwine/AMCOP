@@ -57,9 +57,6 @@ public class mainActivity extends NativeActivity {
 	};
 
 	public native static int pushEvent(int type, int wParam, int lParam, Object obj);
-	public static native void createAudioEngine();
-    public static native void createAudioBufferQueueAudioPlayer();
-    public static native void deleteAudioEngine();
     public static native int setAssetManager(Object assetManager);  
     
 	private static final int INTERVAL = 16;
@@ -133,8 +130,6 @@ public class mainActivity extends NativeActivity {
 		btnZoomInPopUp.dismiss();
 		btnZoomOutPopUp.dismiss();
 		
-		// delete native audio system
-		deleteAudioEngine();
 	}
 
 	/*
