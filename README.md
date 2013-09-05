@@ -7,13 +7,12 @@ Forget the difficult and complex ndk debugger. Use powerful visual studio debugg
 ## Import
 
 ### Android
-Import `Existing Android Code Into Workspace.`
-Check your android-ndk path.
-`Properties` > `Builders` > `AMCOP_NDK` > `Main` tab > `Location`
+- Import `Existing Android Code Into Workspace.`
+- Check your android-ndk path. > `Properties` > `Builders` > `AMCOP_NDK` > `Main` tab > `Location`
 
 ### MFC
-Open Project file
-/AMCOP/vsProject/ **AMCOP.sln**
+- Open Project file
+- /AMCOP/vsProject/ **AMCOP.sln**
 
 ## Important
 
@@ -21,9 +20,9 @@ If you add a file to a visual studio project, You don't forget android.mk file c
 
 ## Author
 
-Wooram, Hong (venomwine)
-www.venomwine.com
-venomwine@gmail.com 
+- Wooram, Hong (venomwine)
+- www.venomwine.com
+- venomwine@gmail.com 
  
 ## License
 
