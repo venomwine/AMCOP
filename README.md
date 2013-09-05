@@ -24,7 +24,7 @@ If you add a file to a visual studio project, You don't forget android.mk file c
 Wooram, Hong (venomwine)
 www.venomwine.com
 venomwine@gmail.com 
-
+ 
 ## License
 
 Licensed under [GPLv3][gplv3]. Enjoy.
