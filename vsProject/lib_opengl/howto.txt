@@ -1,0 +1,10 @@
+(If the file does not exist.) Copy to .. 
+
+*.h : 
+	C:\Program Files\Microsoft SDKs\Windows\v6.0A\Include\gl
+
+*.lib : 
+	C:\Program Files\Microsoft SDKs\Windows\v6.0A\Lib
+
+*.dll : 
+	C:\Windows\System32 

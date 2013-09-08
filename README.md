@@ -20,8 +20,8 @@ If you add a file to a visual studio project, You don't forget android.mk file c
 
 ## Author
 
-- Wooram, Hong (venomwine)
-- www.venomwine.com
+- Wooram, Hong
+- https://github.com/venomwine/AMCOP
 - venomwine@gmail.com 
  
 ## License

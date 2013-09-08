@@ -18,7 +18,7 @@ TouchGesture TG;
 oglFunctions OGL;
 
 AAssetManager *g_assetMgr;
-JNIEnv* g_env;
+char g_sdcardPath[512]={0,};
 
 /**
  * Shared state for our app.

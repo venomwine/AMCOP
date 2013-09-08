@@ -1,11 +1,28 @@
+// =========================================================
+//
+// type.h
+// defines & constants module
+// Created by Wooram Hong 2013/02/06
+// This file is part of the AMCOP project.
+//
+// =========================================================
+
 #ifndef __TYPES_H__
 #define __TYPES_H__
 
 #if IS_ANDROID
+#include <stdlib.h>
+#include <unistd.h>
+#include <errno.h>
+#include <math.h>
 #include <EGL/egl.h>
 #include <GLES/gl.h>
-#include <android/log.h>
 #include <time.h>
+#include <android/sensor.h>
+#include <android/log.h>
+#include <android/asset_manager.h>
+#include <android/asset_manager_jni.h>
+#include <android_native_app_glue.h>
 #include <assert.h>
 
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__))
@@ -18,6 +35,7 @@ typedef unsigned short      WORD;
 typedef char CHAR;
 typedef short SHORT;
 typedef long LONG;
+typedef unsigned long           ULONG;
 
 #pragma pack(push)
 #pragma pack(1)
@@ -48,7 +66,19 @@ typedef struct tagBITMAPFILEHEADER
 
 #pragma pack(pop)
 
+int g_fdOpen(const char* filename);
+int g_fdRead(int fd, void *buff, int size);
+int g_fdSeek(int fd, int offset, int type);
+int g_fdClose(int fd);
+
+AAsset *g_aOpen(const char* filename);
+int g_aRead(AAsset* asset, void *buff, int size, int num);
+void g_aSeek(AAsset* asset, int offset, int type);
+off_t g_aTell(AAsset* asset);
+void g_aClose(AAsset* asset);
+
 int g_LoadBitmapFile(unsigned char* &bitmapImage, char *filename, BITMAPINFOHEADER *bitmapInfoHeader);
+size_t g_LoadFTFile( char *filename, unsigned char* &ftBuffer);
 
 #else
 #define LOGI(...) printf(__VA_ARGS__);
@@ -100,6 +130,7 @@ struct OBJINFO {
 	unsigned int objID;
 	GLfloat x;
 	GLfloat y;
+	GLfloat z;
 };
 
 // push event type
@@ -133,18 +164,31 @@ enum {
 // map control values
 enum {
 	INIT_ZOOM_VAL		= 1500,
+	MAP_ZOOM_UNIT		= 200,
 	LIMIT_ZOOM_MIN		= 100,
 	LIMIT_GLOBE_LINE	= 2800000,
 	LIMIT_ZOOM_MAX		= 6000000,
+	LIMIT_TILT_MIN		= 10,
+	LIMIT_TILT_MAX		= 89,
 	GLOBE_SIZE			= 1900000,
 	MAP_EXPANSION		= 100000,
 	MAP_BOX_UNIT		= 90 * MAP_EXPANSION,
 	MAP_GRIDGAP			= 90,
 	MAP_GRIDCOUNT		= 30,
 	MAP_SMOOTHMOVE_GAP	= 15,
-	MAP_INERTIA_UNIT   = 2000,
-	MAP_INERTIA_VALUE = 2,
-	TIME_DIV_VALUE = 1000000000,
+	MAP_INERTIA_UNIT   	= 2000,
+	MAP_INERTIA_VALUE 	= 2,
+	TIME_DIV_VALUE 		= 1000000000,
+	MAP_TILT_SPEED		= 10,
 };
+
+// view type
+enum {
+	CURRENT_VIEW	=	0,
+	TARGET_VIEW		=	1,
+	CHANGE_VIEW		=	2,
+	SET_VIEW		=	3,
+};
+
 
 #endif

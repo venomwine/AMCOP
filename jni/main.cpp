@@ -1,17 +1,3 @@
-#include <stdlib.h>
-#include <errno.h>
-
-#include <EGL/egl.h>
-#include <GLES/gl.h>
-
-#include <math.h>
-
-#include <android/sensor.h>
-#include <android/log.h>
-#include <android/asset_manager.h>
-#include <android/asset_manager_jni.h>
-#include <android_native_app_glue.h>
-
 #include "main.h"
 
 static int engine_change_display(struct engine* engine) {
@@ -102,7 +88,7 @@ static void engine_draw_frame(struct engine* engine) {
     TG.flag += TG.flag < TOUCH_FLAG ? 1 : 0;
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    OGL.calcSmoothView();
+    OGL.m_VC->calcSmoothView();
     OGL.draw3DWorld();
     OGL.draw2DInfo();
     eglSwapBuffers(engine->display, engine->surface);
@@ -188,8 +174,8 @@ static int32_t engine_handle_input(struct android_app* app,
 				unsigned int objID = 0;
 				int retval = OGL.getObjInfo(point[0].x, point[0].y, objID, mx, my);
 				if(retval > 0) {
-					showAndroidPopup(retval, objID, mx, my);
-					TG.popup = TOUCH_POPUP;
+//					showAndroidPopup(retval, objID, mx, my);
+//					TG.popup = TOUCH_POPUP;
 				}
 			} else if (TG.count >= TOUCH_ACTION_COUNT) {
 //				LOGI("[MAP]CLICK UP");
@@ -207,8 +193,8 @@ static int32_t engine_handle_input(struct android_app* app,
 
 				if(upTime - firstTime < touchMoveDist / MAP_INERTIA_UNIT) {
 					if(0.0f < touchMoveDist) {
-						float moveDegree = OGL.getTanDegree((float)touchMoveXVal, (float)touchMoveYVal);
-						OGL.changeViewCenter(moveDegree, touchMoveDist * MAP_INERTIA_VALUE * (OGL.getEyeDistance3D() / INIT_ZOOM_VAL));	// map 올리면 조절 필요
+						float moveDegree = OGL.m_VC->getTanDegree((float)touchMoveXVal, (float)touchMoveYVal);
+						OGL.m_VC->changeViewCenter(moveDegree, touchMoveDist * MAP_INERTIA_VALUE * (OGL.m_VC->getEyeDistance3D(CURRENT_VIEW) / INIT_ZOOM_VAL));	// map ?�리�?조절 ?�요
 					}
 				}
 			}
@@ -230,8 +216,8 @@ static int32_t engine_handle_input(struct android_app* app,
 					{
 						if(0.0f < moveDist) {
 //							LOGI("[MAP]CENTER MOVE");
-							float moveDegree = OGL.getTanDegree((float)moveXVal, (float)moveYVal);
-							OGL.changeViewCenter(moveDegree, moveDist * (OGL.getEyeDistance3D() / INIT_ZOOM_VAL));	// map 올리면 조절 필요
+							float moveDegree = OGL.m_VC->getTanDegree((float)moveXVal, (float)moveYVal);
+							OGL.m_VC->changeViewCenter(moveDegree, moveDist * (OGL.m_VC->getEyeDistance3D(CURRENT_VIEW) / INIT_ZOOM_VAL));	// map ?�리�?조절 ?�요
 						}
 					}
 					break;
@@ -242,17 +228,24 @@ static int32_t engine_handle_input(struct android_app* app,
 						float newTouchDistance = sqrt(pow((double)(point[0].x - point[1].x), 2) + pow((double)(point[0].y - point[1].y), 2));
 						float zoomVal = oldTouchDistance - newTouchDistance;
 
-						OGL.changeEyeDistance(zoomVal * (OGL.getEyeDistance3D() / 1000.0f));	// map 올리면 조절 필요
+						float moveXVal = point[0].x - oldPoint[0].x;
+//						float moveYVal = -(point[0].y - oldPoint[0].y);
+
+						if(point[0].y > point[1].y)
+							moveXVal = -moveXVal;
+
+						// ZOOM
+						OGL.m_VC->setEyeDistance(CHANGE_VIEW, zoomVal * (OGL.m_VC->getEyeDistance3D(CURRENT_VIEW) > LIMIT_GLOBE_LINE ? OGL.m_VC->getEyeDistance3D(CURRENT_VIEW)/INIT_ZOOM_VAL*5.0f : OGL.m_VC->getEyeDistance3D(CURRENT_VIEW)/INIT_ZOOM_VAL*10.0f));
 					}
 					break;
 				case 3:	// EYE MOVE
 					{
-//						LOGI("[MAP]EYE MOVE");
-						int moveXVal = point[0].x - oldPoint[0].x;
-						int moveYVal = -(point[0].y - oldPoint[0].y);
+						LOGI("[MAP]EYE MOVE");
+						float moveXVal = point[0].x - oldPoint[0].x;
+						float moveYVal = -(point[0].y - oldPoint[0].y);
 
-						OGL.changeEyeTurnAngle((float)moveXVal/2);
-						OGL.changeEyeTiltAngle((float)moveYVal/2);
+						OGL.m_VC->setEyeTurnAngle(CHANGE_VIEW, moveXVal/2.0f);
+						OGL.m_VC->setEyeTiltAngle(CHANGE_VIEW, moveYVal/2.0f);	// zoom 레벨에 따른 tilt 각도 고정.
 					}
 					break;
 				default:
@@ -451,55 +444,55 @@ jint pushEvent
 	switch(message) {
 
 		case PET_VIEW_EYE_MOVE_RIGHT:
-			OGL.changeEyeTurnAngle(0.5f);
+			OGL.m_VC->setEyeTurnAngle(CHANGE_VIEW, 0.5f);
 			break;
 
 		case PET_VIEW_EYE_MOVE_LEFT:
-			OGL.changeEyeTurnAngle(-0.5f);
+			OGL.m_VC->setEyeTurnAngle(CHANGE_VIEW, -0.5f);
 			break;
 
 		case PET_VIEW_EYE_MOVE_UP:
-			OGL.changeEyeTiltAngle(0.5f);
+			OGL.m_VC->setEyeTiltAngle(CHANGE_VIEW, 0.5f);
 			break;
 
 		case PET_VIEW_EYE_MOVE_DOWN:
-			OGL.changeEyeTiltAngle(-0.5f);
+			OGL.m_VC->setEyeTiltAngle(CHANGE_VIEW, -0.5f);
 			break;
 
 		case PET_VIEW_SET_EYE_TOP:
-			OGL.setEyeTurnAngle(0);
-			OGL.setEyeTiltAngle(90);
-			OGL.setEyeDistance(1500.0f);
-			OGL.setViewCenter(0.0f, 0.0f);
+			OGL.m_VC->setEyeTurnAngle(TARGET_VIEW, 0);
+			OGL.m_VC->setEyeTiltAngle(TARGET_VIEW, 90);
+			OGL.m_VC->setEyeDistance(TARGET_VIEW, 1500.0f);
+			OGL.m_VC->setViewCenter(TARGET_VIEW, 0.0f, 0.0f);
 
 			break;
 
 		case PET_VIEW_CENTER_MOVE_RIGHT:
-			OGL.changeViewCenter(90.0f, 4.0f);
+			OGL.m_VC->changeViewCenter(90.0f, 4.0f);
 			break;
 
 		case PET_VIEW_CENTER_MOVE_LEFT:
-			OGL.changeViewCenter(-90.0f, 4.0f);
+			OGL.m_VC->changeViewCenter(-90.0f, 4.0f);
 			break;
 
 		case PET_VIEW_CENTER_MOVE_FRONT_SIDE:
-			OGL.changeViewCenter(0.0f, 4.0f);
+			OGL.m_VC->changeViewCenter(0.0f, 4.0f);
 			break;
 
 		case PET_VIEW_CENTER_MOVE_BACK_SIDE:
-			OGL.changeViewCenter(180.0f, 4.0f);
+			OGL.m_VC->changeViewCenter(180.0f, 4.0f);
 			break;
 
 		case PET_VIEW_SET_CENTER:
-			OGL.setViewCenter(0.0f, 0.0f);
+			OGL.m_VC->setViewCenter(TARGET_VIEW, 0.0f, 0.0f);
 			break;
 
 		case PET_VIEW_ZOOM_IN:
-			OGL.changeEyeDistance(-(OGL.getEyeDistance3D() > LIMIT_GLOBE_LINE ? OGL.getEyeDistance3D()/INIT_ZOOM_VAL*20.0f : OGL.getEyeDistance3D()/INIT_ZOOM_VAL*50.0f));
+			OGL.m_VC->setEyeDistance(CHANGE_VIEW, -0.5 * (OGL.m_VC->getEyeDistance3D(CURRENT_VIEW) > LIMIT_GLOBE_LINE ? OGL.m_VC->getEyeDistance3D(CURRENT_VIEW)/INIT_ZOOM_VAL*20.0f : OGL.m_VC->getEyeDistance3D(CURRENT_VIEW)/INIT_ZOOM_VAL*50.0f));
 			break;
 
 		case PET_VIEW_ZOOM_OUT:
-			OGL.changeEyeDistance(OGL.getEyeDistance3D() > LIMIT_GLOBE_LINE ? OGL.getEyeDistance3D()/INIT_ZOOM_VAL*20.0f : OGL.getEyeDistance3D()/INIT_ZOOM_VAL*20.0f);
+			OGL.m_VC->setEyeDistance(CHANGE_VIEW, +0.5 * (OGL.m_VC->getEyeDistance3D(CURRENT_VIEW) > LIMIT_GLOBE_LINE ? OGL.m_VC->getEyeDistance3D(CURRENT_VIEW)/INIT_ZOOM_VAL*20.0f : OGL.m_VC->getEyeDistance3D(CURRENT_VIEW)/INIT_ZOOM_VAL*50.0f));
 			break;
 
 		default:
@@ -524,13 +517,27 @@ jint setAssetManager(JNIEnv* env, jclass clazz, jobject assetManager)
 	return 0;
 }
 
+jint setSdcardPath(JNIEnv* env, jclass clazz, jstring sdcardPath)
+{
+	LOGI("[SET SDCARD PATH]");
+
+	const char* str = env->GetStringUTFChars(sdcardPath, 0);
+	memset(g_sdcardPath, 0, 512);
+	strncpy(g_sdcardPath, str, 511);
+	LOGI("==============>> set SDCARD path : %s" ,g_sdcardPath);
+	env->ReleaseStringUTFChars(sdcardPath, str);
+
+	return 0;
+}
+
 /*
- * JNI Function 은 이곳에 등록하여 사용.
+ * JNI Function ?� ?�곳???�록?�여 ?�용.
  */
 static JNINativeMethod wrMethods[] = {
 	/* name, signature, funcPtr */
-	{"pushEvent"										, "(IIILjava/lang/Object;)I"		, (void*)pushEvent		},
+	{"pushEvent"									, "(IIILjava/lang/Object;)I"		, (void*)pushEvent		},
 	{"setAssetManager"								, "(Ljava/lang/Object;)I"		, (void*)setAssetManager		},
+	{"setSdcardPath"								, "(Ljava/lang/String;)I"			, (void*)setSdcardPath		},
 };
 
 int jniRegisterNativeMethods(JNIEnv* env, const char* className, const JNINativeMethod* gMethods, int numMethods)
@@ -547,8 +554,6 @@ int jniRegisterNativeMethods(JNIEnv* env, const char* className, const JNINative
 		LOGI("[JNI]RegisterNatives failed for '%s'\n", className);
 		return -1;
 	}
-
-	g_env = env;
 
 	return 0;
 }
