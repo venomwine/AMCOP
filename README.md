@@ -17,6 +17,7 @@ Forget the difficult and complex ndk debugger. Use powerful visual studio debugg
 ## Important
 
 If you add a file to a visual studio project, You don't forget android.mk file check.
+If an error occurs in the OpenGL, Take a look at the "/AMCOP/vsProject/lib_opengl" folder. 
 
 ## Author
 
