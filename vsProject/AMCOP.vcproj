@@ -396,6 +396,10 @@
 				Name="include"
 				>
 				<File
+					RelativePath="..\engine\include\data.h"
+					>
+				</File>
+				<File
 					RelativePath="..\engine\include\types.h"
 					>
 				</File>

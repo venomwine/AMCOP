@@ -16,9 +16,6 @@ typedef struct _ViewPoint{
 	float eyex;
 	float eyey;
 	float eyez;
-	float uniEyex;
-	float uniEyey;
-	float uniEyez;
 	float centerx;
 	float centery;
 	float centerz;
@@ -60,8 +57,6 @@ public:
 	void setEyeTiltAngle(int eyeType, float degree);
 	void setEyeDistance(int eyeType, float val);
 	
-	void setUniverseEye();
-
 };
 
 #endif

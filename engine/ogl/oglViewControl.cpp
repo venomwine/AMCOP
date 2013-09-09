@@ -25,30 +25,26 @@
 
 oglViewContor::oglViewContor()
 {
-	// set view
-	m_pTargetVP = (ViewPoint *)malloc(sizeof(ViewPoint));
-	memset(m_pTargetVP, 0x00, sizeof(ViewPoint));
-	m_pTargetVP->changeEyeTurnAngleDegreeVal = -90.0f;	// North up (Y axis up)
-	m_pTargetVP->changeEyeTiltAngleDegreeVal = 89.0f;		// 위에서 내려다보기
-	m_pTargetVP->eyez = m_pTargetVP->zoomingVal = INIT_ZOOM_VAL;
-	m_pTargetVP->uniEyez = GLOBE_SIZE + INIT_ZOOM_VAL;
-
-	m_pVP = (ViewPoint *)malloc(sizeof(ViewPoint));
-	memset(m_pVP, 0x00, sizeof(ViewPoint));
-	m_pVP->changeEyeTurnAngleDegreeVal = -90.0f;	// North up (Y axis up)
-	m_pVP->changeEyeTiltAngleDegreeVal = 89.0f;		// 위에서 내려다보기
-	m_pVP->eyez = m_pVP->zoomingVal = INIT_ZOOM_VAL;
-	m_pVP->uniEyez = GLOBE_SIZE + INIT_ZOOM_VAL;
-
 	// set start position
 	float setX = 0.0f;
 	float setY = 0.0f;
 
+	// set view
+	m_pTargetVP = (ViewPoint *)malloc(sizeof(ViewPoint));
+	memset(m_pTargetVP, 0x00, sizeof(ViewPoint));
+	m_pTargetVP->changeEyeTurnAngleDegreeVal = -90.0f;	// Y axis up
+	m_pTargetVP->changeEyeTiltAngleDegreeVal = 89.0f;
+	m_pTargetVP->eyez = m_pTargetVP->zoomingVal = INIT_ZOOM_VAL;
 	m_pTargetVP->eyex = 0.0f;
 	m_pTargetVP->eyey = -1.0f;
 	m_pTargetVP->centerx = setX;
 	m_pTargetVP->centery = setY;
 
+	m_pVP = (ViewPoint *)malloc(sizeof(ViewPoint));
+	memset(m_pVP, 0x00, sizeof(ViewPoint));
+	m_pVP->changeEyeTurnAngleDegreeVal = -90.0f;	// Y axis up
+	m_pVP->changeEyeTiltAngleDegreeVal = 89.0f;
+	m_pVP->eyez = m_pVP->zoomingVal = INIT_ZOOM_VAL;
 	m_pVP->eyex =  0.0f;
 	m_pVP->eyey = -1.0f;
 	m_pVP->centerx = setX;
@@ -112,7 +108,7 @@ float oglViewContor::getTanDegree(float x, float y) {
 	float tanVal = y / x;
 	float moveDegree = 0;
 
-	// tan 연산 시 각도가 90도 단위면 문제가 된다.
+	// problem 90 degree.
 	if(x == 0)
 		moveDegree = y > 0 ? 0.0f : 180.0f;
 	else if(y == 0)
@@ -120,14 +116,14 @@ float oglViewContor::getTanDegree(float x, float y) {
 	else {
 		moveDegree = (atan(tanVal) * 180.0f / M_PI) ;
 		if(x > 0) {
-			if(y < 0) 			// 1사분면
+			if(y < 0) 		// One quadrant
 				moveDegree -= 90.0f;
-			else if(y > 0)	// 4 사분면
+			else if(y > 0)	// Four quadrants
 				moveDegree -= 90.0f;
 		} else if(x < 0) {
-			if(y < 0) 			// 2 사분면
+			if(y < 0) 		// Two quadrants
 				moveDegree += 90.0f;
-			else if(y > 0) 	// 3 사분면
+			else if(y > 0) 	// Three quadrants
 				moveDegree += 90.0f;
 		}
 	}
@@ -138,23 +134,14 @@ void oglViewContor::changeViewCenter(float degree, float val) {
 
  	float moveEyeAngleVal = m_pTargetVP->changeEyeTurnAngleDegreeVal + 180.0f - degree;
 
-	// 지구본에서는 움직임을 빠르게
-	if(getEyeDistance3D(TARGET_VIEW) > LIMIT_GLOBE_LINE) {
-		setEyeTurnAngle(SET_VIEW, 0.0f);
-		setEyeTiltAngle(SET_VIEW, 90.0f);
-		val = val * getEyeDistance3D(CURRENT_VIEW) / LIMIT_GLOBE_LINE * 1.5f;
-	}
-
 	float tmpCy = m_pTargetVP->centery + val * sin((double)moveEyeAngleVal * M_PI / 180.0f);
 
-	// 극지방으로는 지도 이동에 제한을 둔다.
+	// limit move.
 	if(!(tmpCy > MAP_BOX_UNIT-(15*MAP_EXPANSION) || tmpCy < -(MAP_BOX_UNIT-(15*MAP_EXPANSION)))) {
 		m_pTargetVP->centerx = m_pTargetVP->centerx + val * cos((double)moveEyeAngleVal * M_PI / 180.0f);
 		m_pTargetVP->centery = tmpCy;
 	}
 
-	// Repeat map moving. 경도로는 지도가 반복하여 나타난다.
-	// 2D Map 과 Globe 모두 적용되므로 순서 바꾸지 말 것.
 	if(m_pTargetVP->centerx > (MAP_BOX_UNIT*2)) {
 		double xGap = m_pTargetVP->eyex - m_pTargetVP->centerx;
 
@@ -174,8 +161,6 @@ void oglViewContor::changeViewCenter(float degree, float val) {
 		m_pTargetVP->eyex = m_pTargetVP->centerx + xGap;
 	}
 
-	setUniverseEye();
-
 }
 
 void oglViewContor::setEyeTurnAngle(int eyeType, float degree) {
@@ -187,10 +172,10 @@ void oglViewContor::setEyeTurnAngle(int eyeType, float degree) {
 		m_pTargetVP->changeEyeTurnAngleDegreeVal += degree;
 		break;
 	case SET_VIEW:
-		m_pTargetVP->changeEyeTurnAngleDegreeVal = degree - 90.0f;	// 90 을 뺀 이유는 북쪽을 0도로 생각하기 위함임.
+		m_pTargetVP->changeEyeTurnAngleDegreeVal = degree - 90.0f;
 		break;
 	default:
-		m_pTargetVP->changeEyeTurnAngleDegreeVal = degree - 90.0f;	// 90 을 뺀 이유는 북쪽을 0도로 생각하기 위함임.
+		m_pTargetVP->changeEyeTurnAngleDegreeVal = degree - 90.0f;
 		break;
 	}
 	
@@ -262,69 +247,21 @@ void oglViewContor::setEyeDistance(int eyeType, float val) {
 		break;
 	}
 	
-	if(m_pTargetVP->zoomingVal <= LIMIT_ZOOM_MIN)				// 확대 제한
+	if(m_pTargetVP->zoomingVal <= LIMIT_ZOOM_MIN)			// zoom limit.
 		m_pTargetVP->zoomingVal = LIMIT_ZOOM_MIN;
-	else if(m_pTargetVP->zoomingVal >= LIMIT_ZOOM_MAX)		// 축소 제한
+	else if(m_pTargetVP->zoomingVal >= LIMIT_ZOOM_MAX)
 		m_pTargetVP->zoomingVal = LIMIT_ZOOM_MAX;
 
-	if(m_pTargetVP->zoomingVal < LIMIT_GLOBE_LINE) {
-		// 2D map
-		m_pTargetVP->eyez = m_pTargetVP->zoomingVal * sin((double)m_pTargetVP->changeEyeTiltAngleDegreeVal * M_PI / 180.0f);
-		eyeDistance2D = m_pTargetVP->zoomingVal * cos((double)m_pTargetVP->changeEyeTiltAngleDegreeVal * M_PI / 180.0f);
+	// 2D map
+	m_pTargetVP->eyez = m_pTargetVP->zoomingVal * sin((double)m_pTargetVP->changeEyeTiltAngleDegreeVal * M_PI / 180.0f);
+	eyeDistance2D = m_pTargetVP->zoomingVal * cos((double)m_pTargetVP->changeEyeTiltAngleDegreeVal * M_PI / 180.0f);
 
-		m_pTargetVP->eyex = eyeDistance2D * cos((double)m_pTargetVP->changeEyeTurnAngleDegreeVal * M_PI / 180.0f);
-		m_pTargetVP->eyey = eyeDistance2D * sin((double)m_pTargetVP->changeEyeTurnAngleDegreeVal * M_PI / 180.0f);
-	} else {
-		// Globe
-		float ratateVal = (m_pTargetVP->centerx/MAP_EXPANSION) * (M_PI / 180.0f);
-		float tiltVal = (m_pTargetVP->centery/MAP_EXPANSION) * (M_PI / 180.0f);
+	m_pTargetVP->eyex = eyeDistance2D * cos((double)m_pTargetVP->changeEyeTurnAngleDegreeVal * M_PI / 180.0f);
+	m_pTargetVP->eyey = eyeDistance2D * sin((double)m_pTargetVP->changeEyeTurnAngleDegreeVal * M_PI / 180.0f);
 
-		if(tiltVal < (M_PI / 180.0f * -89.0f))
-			tiltVal = (M_PI / 180.0f * -89.0f);
-		else if(tiltVal > (M_PI / 180.0f * 89.0f))
-			tiltVal = (M_PI / 180.0f * 89.0f);
-
-		m_pTargetVP->uniEyez = m_pTargetVP->zoomingVal * sin(tiltVal);
-		eyeDistance2D = m_pTargetVP->zoomingVal * cos(tiltVal);
-
-		m_pTargetVP->uniEyex = eyeDistance2D * cos(ratateVal);
-		m_pTargetVP->uniEyey = eyeDistance2D * sin(ratateVal);
-	}
-}
-
-void oglViewContor::setUniverseEye() {
-	float eyeDistance2D = 0;
-
-	double ratateVal = (m_pTargetVP->centerx/MAP_EXPANSION) * (M_PI / 180.0f);
-	double tiltVal = (m_pTargetVP->centery/MAP_EXPANSION) * (M_PI / 180.0f);
-
-	if(tiltVal < (M_PI / 180.0f * -89.0f))
-		tiltVal = (M_PI / 180.0f * -89.0f);
-	else if(tiltVal > (M_PI / 180.0f * 89.0f))
-		tiltVal = (M_PI / 180.0f * 89.0f);
-
-	m_pTargetVP->uniEyez = getEyeDistance3D(TARGET_VIEW) * sin(tiltVal);
-	eyeDistance2D = getEyeDistance3D(TARGET_VIEW) * cos(tiltVal);
-
-	m_pTargetVP->uniEyex = eyeDistance2D * cos(ratateVal);
-	m_pTargetVP->uniEyey = eyeDistance2D * sin(ratateVal);
 }
 
 void oglViewContor::calcSmoothView() {
-
-	// Globe 용
- 	float rotateVal = (m_pVP->centerx/MAP_EXPANSION) * (M_PI / 180.0f);
- 	float tiltVal = (m_pVP->centery/MAP_EXPANSION) * (M_PI / 180.0f);
- 	if(tiltVal < (M_PI / 180.0f * -89.0f))
- 		tiltVal = (M_PI / 180.0f * -89.0f);
- 	else if(tiltVal > (M_PI / 180.0f * 89.0f))
- 		tiltVal = (M_PI / 180.0f * 89.0f);
- 
- 	// Uni Eye Position
- 	float eyeUniDistance2D = getEyeDistance3D(TARGET_VIEW) * cos(tiltVal);
- 	m_pVP->uniEyex = eyeUniDistance2D * cos(rotateVal);
-	m_pVP->uniEyey = eyeUniDistance2D * sin(rotateVal);
-	m_pVP->uniEyez = getEyeDistance3D(TARGET_VIEW) * sin(tiltVal);
 
  	// calc gap
  	float gapEyeX = m_pTargetVP->eyex - m_pVP->eyex;
@@ -335,52 +272,19 @@ void oglViewContor::calcSmoothView() {
 	float gapCenterY = m_pTargetVP->centery - m_pVP->centery;
 	float gapCenterZ = m_pTargetVP->centerz - m_pVP->centerz;
 
-// 	if(gapCenterX != 0)
-// 		gapEyeX = gapCenterX;
-// 
-// 	if(gapCenterY != 0)
-// 		gapEyeY = gapCenterY;
-// 
-// 	if(gapCenterZ != 0)
-// 		gapEyeZ = gapCenterZ;
-
 	int zoomLevel = (int)(sqrt((m_pVP->zoomingVal / 200.0f)) + 1) * (float)MAP_SMOOTHMOVE_GAP / 2;
 
-	// Eye Position
-// 	if(gapEyeX <= zoomLevel && gapEyeX >= -zoomLevel)
-// 		m_pVP->eyex = m_pTargetVP->eyex;
-// 	else
-		m_pVP->eyex = m_pVP->eyex + (gapEyeX / (float)MAP_SMOOTHMOVE_GAP);
+	m_pVP->eyex = m_pVP->eyex + (gapEyeX / (float)MAP_SMOOTHMOVE_GAP);
+	m_pVP->eyey = m_pVP->eyey + (gapEyeY / (float)MAP_SMOOTHMOVE_GAP);
+	m_pVP->eyez = m_pVP->eyez + (gapEyeZ / (float)MAP_SMOOTHMOVE_GAP);
 
-// 	if(gapEyeY <= zoomLevel && gapEyeY >= -zoomLevel)
-// 		m_pVP->eyey = m_pTargetVP->eyey;
-// 	else
-		m_pVP->eyey = m_pVP->eyey + (gapEyeY / (float)MAP_SMOOTHMOVE_GAP);
+	m_pVP->centerx = m_pVP->centerx + (gapCenterX / (float)MAP_SMOOTHMOVE_GAP);
+	m_pVP->centery = m_pVP->centery + (gapCenterY / (float)MAP_SMOOTHMOVE_GAP);
+	m_pVP->centerz = m_pVP->centerz + (gapCenterZ / (float)MAP_SMOOTHMOVE_GAP);
 
-// 	if(gapEyeZ <= zoomLevel && gapEyeZ >= -zoomLevel)
-// 		m_pVP->eyez = m_pTargetVP->eyez;
-// 	else
-		m_pVP->eyez = m_pVP->eyez + (gapEyeZ / (float)MAP_SMOOTHMOVE_GAP);
-
-	// Center Position
-// 	if(gapCenterX <= zoomLevel && gapCenterX >= -zoomLevel)
-// 		m_pVP->centerx = m_pTargetVP->centerx;
-// 	else
-		m_pVP->centerx = m_pVP->centerx + (gapCenterX / (float)MAP_SMOOTHMOVE_GAP);
-
-// 	if(gapCenterY <= zoomLevel && gapCenterY >= -zoomLevel)
-// 		m_pVP->centery = m_pTargetVP->centery;
-// 	else
-		m_pVP->centery = m_pVP->centery + (gapCenterY / (float)MAP_SMOOTHMOVE_GAP);
-
-// 	if(gapCenterZ <= zoomLevel && gapCenterZ >= -zoomLevel)
-// 		m_pVP->centerz = m_pTargetVP->centerz;
-// 	else
-		m_pVP->centerz = m_pVP->centerz + (gapCenterZ / (float)MAP_SMOOTHMOVE_GAP);
-
-	// Set Angle	// POI 각도 계산에 필요
+	// Set Angle	// for billboard angle.
 	m_pVP->changeEyeTurnAngleDegreeVal = getTanDegree(m_pVP->eyex, m_pVP->eyey) + 90;
-	m_pVP->changeEyeTiltAngleDegreeVal = m_pTargetVP->changeEyeTiltAngleDegreeVal;//(int)asin((m_pVP->eyez - m_pVP->centerz) / M_PI * 180.0f / getEyeDistance3D(TARGET_VIEW));
+	m_pVP->changeEyeTiltAngleDegreeVal = m_pTargetVP->changeEyeTiltAngleDegreeVal;
 
 	// set zoom
 	float currEyeDistance3D = pow(m_pVP->eyex, 2)

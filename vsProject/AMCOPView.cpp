@@ -80,7 +80,7 @@ void CAMCOPView::OnDraw(CDC* pDC)
 	m_TG.flag += m_TG.flag < TOUCH_FLAG ? 1 : 0;
 
 	DWORD getCurTick = GetTickCount();
-	if(getCurTick - m_drawTick < FRAMELIMIT)	// 프레임 수 제한.
+	if(getCurTick - m_drawTick < FRAMELIMIT)	// Limit Frame.
 		return;
 
 	m_OGL.m_VC->calcSmoothView();
@@ -232,7 +232,7 @@ void CAMCOPView::OnLButtonUp(UINT nFlags, CPoint point)
 		unsigned int objID = 0;
 		int retval = m_OGL.getObjInfo(point.x, point.y, objID, mx, my);
 		if(retval > 0) {
-//			SwapBuffers(m_hDC);	// 클릭 디버깅용
+//			SwapBuffers(m_hDC);	// for click debug.
 			Invalidate(FALSE);
 // 			char temp[100] = {0, };
 // 			sprintf(temp, "[%d][%d], %f, %f", retval, objID, mx/MAP_EXPANSION, my/MAP_EXPANSION);
@@ -251,7 +251,7 @@ void CAMCOPView::OnLButtonUp(UINT nFlags, CPoint point)
 		if( ((float)(m_touchCheck[1].time - m_touchCheck[0].time)) / 1000 < touchMoveDist / MAP_INERTIA_UNIT) {
 			if(0.0f < touchMoveDist) {
 				float moveDegree = m_OGL.m_VC->getTanDegree((float)touchMoveXVal, (float)touchMoveYVal);
-				m_OGL.m_VC->changeViewCenter(moveDegree, touchMoveDist * MAP_INERTIA_VALUE * (m_OGL.m_VC->getEyeDistance3D(CURRENT_VIEW) / INIT_ZOOM_VAL));	// map 올리면 조절 필요
+				m_OGL.m_VC->changeViewCenter(moveDegree, touchMoveDist * MAP_INERTIA_VALUE * (m_OGL.m_VC->getEyeDistance3D(CURRENT_VIEW) / INIT_ZOOM_VAL));	
 			}
 		}
 	}
@@ -304,7 +304,7 @@ void CAMCOPView::OnMouseMove(UINT nFlags, CPoint point)
 				break;
 			case 2:	// ZOOM
 				{
-					// 줌은 마우스 휠로
+					// mouse wheel..
 				}
 				break;
 			case 3:	// EYE MOVE
@@ -313,7 +313,7 @@ void CAMCOPView::OnMouseMove(UINT nFlags, CPoint point)
 					float moveYVal = -(point.y - m_oldPoint.y);
 
 					m_OGL.m_VC->setEyeTurnAngle(CHANGE_VIEW, moveXVal/2.0f);
-					m_OGL.m_VC->setEyeTiltAngle(CHANGE_VIEW, moveYVal/2.0f);	// zoom 레벨에 따른 tilt 각도 고정.
+					m_OGL.m_VC->setEyeTiltAngle(CHANGE_VIEW, moveYVal/2.0f);
 					Invalidate(FALSE);
 				}
 				break;
@@ -332,7 +332,7 @@ BOOL CAMCOPView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
 	// TODO: Add your message handler code here and/or call default
 	float zoomVal = zDelta / 10;
-	m_OGL.m_VC->setEyeDistance(CHANGE_VIEW, zoomVal * (m_OGL.m_VC->getEyeDistance3D(CURRENT_VIEW) > LIMIT_GLOBE_LINE ? m_OGL.m_VC->getEyeDistance3D(CURRENT_VIEW)/INIT_ZOOM_VAL*5.0f : m_OGL.m_VC->getEyeDistance3D(CURRENT_VIEW)/INIT_ZOOM_VAL*10.0f));
+	m_OGL.m_VC->setEyeDistance(CHANGE_VIEW, zoomVal * m_OGL.m_VC->getEyeDistance3D(CURRENT_VIEW)/INIT_ZOOM_VAL*10.0f);
 	Invalidate(FALSE);
 
 	//return CView::OnMouseWheel(nFlags, zDelta, pt);
@@ -371,11 +371,11 @@ void CAMCOPView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		break;
 
 	case VK_OEM_PLUS:
-		m_OGL.m_VC->setEyeDistance(CHANGE_VIEW, -10 * (m_OGL.m_VC->getEyeDistance3D(CURRENT_VIEW) > LIMIT_GLOBE_LINE ? m_OGL.m_VC->getEyeDistance3D(CURRENT_VIEW)/INIT_ZOOM_VAL*20.0f : m_OGL.m_VC->getEyeDistance3D(CURRENT_VIEW)/INIT_ZOOM_VAL*50.0f));
+		m_OGL.m_VC->setEyeDistance(CHANGE_VIEW, -10 * m_OGL.m_VC->getEyeDistance3D(CURRENT_VIEW)/INIT_ZOOM_VAL*50.0f);
 		Invalidate(FALSE);
 		break;
 	case VK_OEM_MINUS:
-		m_OGL.m_VC->setEyeDistance(CHANGE_VIEW, +10 * (m_OGL.m_VC->getEyeDistance3D(CURRENT_VIEW) > LIMIT_GLOBE_LINE ? m_OGL.m_VC->getEyeDistance3D(CURRENT_VIEW)/INIT_ZOOM_VAL*20.0f : m_OGL.m_VC->getEyeDistance3D(CURRENT_VIEW)/INIT_ZOOM_VAL*50.0f));
+		m_OGL.m_VC->setEyeDistance(CHANGE_VIEW, +10 * m_OGL.m_VC->getEyeDistance3D(CURRENT_VIEW)/INIT_ZOOM_VAL*50.0f);
 		Invalidate(FALSE);
 		break;
 

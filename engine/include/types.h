@@ -135,30 +135,30 @@ struct OBJINFO {
 
 // push event type
 enum {
-	PET_VIEW_EYE_MOVE_RIGHT = 0, 			// View center 중심으로 eye 를 오른쪽으로 회전
-	PET_VIEW_EYE_MOVE_LEFT,					// View center 중심으로 eye 를 왼쪽으로 회전
-	PET_VIEW_EYE_MOVE_UP,					// View center 중심으로 eye 를 위로 회전
-	PET_VIEW_EYE_MOVE_DOWN,				// View center 중심으로 eye 를 아래로 회전
-	PET_VIEW_CENTER_MOVE_RIGHT,			// View center 중심을 center to eye 연장선의 90도 방향으로 (x, y axis 값만) 이동, eye 도 같이 이동.
-	PET_VIEW_CENTER_MOVE_LEFT,			// View center 중심을 center to eye 연장선의 -90도 방향으로 (x, y axis 값만) 이동, eye 도 같이 이동.
-	PET_VIEW_CENTER_MOVE_FRONT_SIDE,	// View center 중심을 center to eye 연장선의 0도 방향으로 (x, y axis 값만) 이동, eye 도 같이 이동.
-	PET_VIEW_CENTER_MOVE_BACK_SIDE,	// View center 중심을 center to eye 연장선의 180도 방향으로 (x, y axis 값만) 이동, eye 도 같이 이동.
-	PET_VIEW_ZOOM_IN,							// View center to eye 연장선 위에서 이동. center 와 eye 의 거리를 줄인다.
-	PET_VIEW_ZOOM_OUT,						// View center to eye 연장선 위에서 이동. center 와 eye 의 거리를 늘인다.
-	PET_VIEW_SET_EYE_LR,						// View center 중심으로 eye 위치의 각도 지정.
-	PET_VIEW_SET_EYE_UD,						// View center 중심으로 eye 높이 각도 지정.
-	PET_VIEW_SET_EYE_TOP,						// View center 중심으로 eye 가 center 위에서 본다.
-	PET_VIEW_SET_CENTER,						// View center 지정.
-	PET_VIEW_SET_ZOOM,						// View zoom 지정.
+	PET_VIEW_EYE_MOVE_RIGHT = 0,
+	PET_VIEW_EYE_MOVE_LEFT,
+	PET_VIEW_EYE_MOVE_UP,
+	PET_VIEW_EYE_MOVE_DOWN,
+	PET_VIEW_CENTER_MOVE_RIGHT,
+	PET_VIEW_CENTER_MOVE_LEFT,
+	PET_VIEW_CENTER_MOVE_FRONT_SIDE,
+	PET_VIEW_CENTER_MOVE_BACK_SIDE,
+	PET_VIEW_ZOOM_IN,
+	PET_VIEW_ZOOM_OUT,
+	PET_VIEW_SET_EYE_LR,
+	PET_VIEW_SET_EYE_UD,
+	PET_VIEW_SET_EYE_TOP,
+	PET_VIEW_SET_CENTER,
+	PET_VIEW_SET_ZOOM,
 } ;
 
 // touch control values
 enum {
 	TOUCH_INIT = 0,
-	TOUCH_POPUP = 1,				// 팝업 확인용
-	TOUCH_FLAG = 3,					// 터치 튐 방지
-	TOUCH_ACTION_COUNT = 5,	// 다른 액션 방지
-	TOUCH_TICK_COUNT = 30,		// 스크린 클릭 확인용
+	TOUCH_POPUP = 1,
+	TOUCH_FLAG = 3,
+	TOUCH_ACTION_COUNT = 5,
+	TOUCH_TICK_COUNT = 30,
 };
 
 // map control values
@@ -166,12 +166,10 @@ enum {
 	INIT_ZOOM_VAL		= 1500,
 	MAP_ZOOM_UNIT		= 200,
 	LIMIT_ZOOM_MIN		= 100,
-	LIMIT_GLOBE_LINE	= 2800000,
 	LIMIT_ZOOM_MAX		= 6000000,
 	LIMIT_TILT_MIN		= 10,
 	LIMIT_TILT_MAX		= 89,
-	GLOBE_SIZE			= 1900000,
-	MAP_EXPANSION		= 100000,
+	MAP_EXPANSION		= 100,
 	MAP_BOX_UNIT		= 90 * MAP_EXPANSION,
 	MAP_GRIDGAP			= 90,
 	MAP_GRIDCOUNT		= 30,
@@ -179,7 +177,6 @@ enum {
 	MAP_INERTIA_UNIT   	= 2000,
 	MAP_INERTIA_VALUE 	= 2,
 	TIME_DIV_VALUE 		= 1000000000,
-	MAP_TILT_SPEED		= 10,
 };
 
 // view type

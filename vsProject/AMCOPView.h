@@ -24,8 +24,8 @@ public:
 
 	enum {
 		TOUCH_INIT = 0,
-		TOUCH_FLAG = 3,					// 터치 튐 방지
-		TOUCH_ACTION_COUNT = 5,	// 다른 액션 방지
+		TOUCH_FLAG = 3,			// Crazy Touch protection.
+		TOUCH_ACTION_COUNT = 5,	// Other Action protection.
 	};
 
 	TouchCheck	m_touchCheck[2];

@@ -235,7 +235,7 @@ static int32_t engine_handle_input(struct android_app* app,
 							moveXVal = -moveXVal;
 
 						// ZOOM
-						OGL.m_VC->setEyeDistance(CHANGE_VIEW, zoomVal * (OGL.m_VC->getEyeDistance3D(CURRENT_VIEW) > LIMIT_GLOBE_LINE ? OGL.m_VC->getEyeDistance3D(CURRENT_VIEW)/INIT_ZOOM_VAL*5.0f : OGL.m_VC->getEyeDistance3D(CURRENT_VIEW)/INIT_ZOOM_VAL*10.0f));
+						OGL.m_VC->setEyeDistance(CHANGE_VIEW, zoomVal * OGL.m_VC->getEyeDistance3D(CURRENT_VIEW)/INIT_ZOOM_VAL*10.0f);
 					}
 					break;
 				case 3:	// EYE MOVE
@@ -488,11 +488,11 @@ jint pushEvent
 			break;
 
 		case PET_VIEW_ZOOM_IN:
-			OGL.m_VC->setEyeDistance(CHANGE_VIEW, -0.5 * (OGL.m_VC->getEyeDistance3D(CURRENT_VIEW) > LIMIT_GLOBE_LINE ? OGL.m_VC->getEyeDistance3D(CURRENT_VIEW)/INIT_ZOOM_VAL*20.0f : OGL.m_VC->getEyeDistance3D(CURRENT_VIEW)/INIT_ZOOM_VAL*50.0f));
+			OGL.m_VC->setEyeDistance(CHANGE_VIEW, -0.5 * OGL.m_VC->getEyeDistance3D(CURRENT_VIEW)/INIT_ZOOM_VAL*50.0f);
 			break;
 
 		case PET_VIEW_ZOOM_OUT:
-			OGL.m_VC->setEyeDistance(CHANGE_VIEW, +0.5 * (OGL.m_VC->getEyeDistance3D(CURRENT_VIEW) > LIMIT_GLOBE_LINE ? OGL.m_VC->getEyeDistance3D(CURRENT_VIEW)/INIT_ZOOM_VAL*20.0f : OGL.m_VC->getEyeDistance3D(CURRENT_VIEW)/INIT_ZOOM_VAL*50.0f));
+			OGL.m_VC->setEyeDistance(CHANGE_VIEW, +0.5 * OGL.m_VC->getEyeDistance3D(CURRENT_VIEW)/INIT_ZOOM_VAL*50.0f);
 			break;
 
 		default:

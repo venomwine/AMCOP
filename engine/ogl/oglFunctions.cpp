@@ -21,69 +21,10 @@ extern char g_sdcardPath[512];
 #include "../../vsProject/StdAfx.h"
 #endif
 
-
 #include <math.h>
+#include "../include/data.h"
 #include "gluLookAt.h"
 #include "oglFunctions.h"
-
-#define LENGTH (100)
-static const GLfloat triangleBuffer[] = {
-/*        X                Y          Z */
-	LENGTH/2, 	LENGTH/2,
-	-LENGTH/2, 	LENGTH/2,
-	0, 					0,
-	
-};
-
-static float colorBuffer[] = {
-/*   R    G    B    A  */
-	1.0, 0.0, 0.0, 1.0,
-	0.0, 1.0, 0.0, 1.0,
-	0.0, 0.0, 1.0, 1.0,
-	0.5, 0.5, 0.0, 1.0,
-};
-
-static const GLfloat cubeVertices[] = {
-	-LENGTH / 2, -LENGTH / 2,  LENGTH,
-	LENGTH / 2, -LENGTH / 2,  LENGTH,
-	-LENGTH / 2,  LENGTH / 2,  LENGTH,
-	LENGTH / 2,  LENGTH / 2,  LENGTH,
-	-LENGTH / 2, -LENGTH / 2, 0,
-	LENGTH / 2, -LENGTH / 2, 0,
-	-LENGTH / 2,  LENGTH / 2, 0,
-	LENGTH / 2,  LENGTH / 2, 0,
-};
-
-static const GLushort cubeIndices[] = {
-	0, 1, 2, 3, 7, 1, 5, 4, 7, 6, 2, 4, 0, 1
-};
-
-static const GLubyte cubeColors[] = {
-	255, 255,   0, 255,
-	0,   255, 255, 255,
-	0,     0, 255, 255,
-	255,   0, 255, 255,
-	255, 255,   0, 255,
-	0,   255, 255, 255,
-	0,     0, 255, 255,
-	255,   0, 255, 255
-};
-
-static const GLfloat gridLine[] = {
-	MAP_BOX_UNIT*2, 0, 0,
-	-MAP_BOX_UNIT*2, 0, 0,
-	0, MAP_BOX_UNIT, 0,
-	0, -MAP_BOX_UNIT, 0,
-	0, 0, 0,
-	0, 0, 7000000,
-};
-
-static const GLfloat selectPosition[] = {
-	-25, 0,
-	25, 0,
-	0, -25,
-	0, 25,
-};
 
 oglFunctions::oglFunctions()
 {
@@ -114,9 +55,6 @@ void oglFunctions::gluPerspective(double fovy, double aspect, double zNear, doub
 }
 
 int oglFunctions::initWorld(int32_t width, int32_t height) {
-	/************************************************************************/
-	/* 표시를 초기화한다.                                                   */
-	/************************************************************************/
 
 	// OPENGL INIT //////////////////////////////////////////////////
     glEnable(GL_NORMALIZE);
@@ -149,7 +87,6 @@ int oglFunctions::initWorld(int32_t width, int32_t height) {
 }
 
 void oglFunctions::draw3DWorld() {
-	// 프레임을 표시할 때마다 매번 초기화 한다.
 
 	glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -161,7 +98,7 @@ void oglFunctions::draw3DWorld() {
 
 	gluLookAt(m_VC->getVP(CURRENT_VIEW)->centerx + m_VC->getVP(CURRENT_VIEW)->eyex, m_VC->getVP(CURRENT_VIEW)->centery + m_VC->getVP(CURRENT_VIEW)->eyey, m_VC->getVP(CURRENT_VIEW)->eyez, m_VC->getVP(CURRENT_VIEW)->centerx, m_VC->getVP(CURRENT_VIEW)->centery, m_VC->getVP(CURRENT_VIEW)->centerz, 0.0f, 0.0f, 1.0f );
 
-	//나중에 지울 부분. 개발 편의를 위해 둔 것임.
+	// grid
     glPushMatrix();
     glLineWidth(3.0f);
     glVertexPointer(3, GL_FLOAT, 0, gridLine);
@@ -176,7 +113,7 @@ void oglFunctions::draw3DWorld() {
 	glEnable(GL_DEPTH_TEST);
 
 
-	// 그리기
+	// draw
     glEnableClientState(GL_COLOR_ARRAY);
 
     glVertexPointer(3, GL_FLOAT, 0, cubeVertices);
@@ -232,14 +169,7 @@ void oglFunctions::draw3DWorld() {
 }
 
 void oglFunctions::draw2DInfo() {
-	/************************************************************************/
-	/* 2D 로 그리고 싶은거 여기 모여라~~                                    */
-	/* 2D 로 보이기 위한 각도 계산											*/
-	/************************************************************************/
 	
-	if(m_VC->getEyeDistance3D(CURRENT_VIEW) > LIMIT_GLOBE_LINE)
-		return;
-
 	float view2Dz = (m_VC->getVP(CURRENT_VIEW)->changeEyeTurnAngleDegreeVal) + 90.0f;
 	float view2Dx = -(m_VC->getVP(CURRENT_VIEW)->changeEyeTiltAngleDegreeVal) + 90.0f;
 
@@ -264,7 +194,7 @@ void oglFunctions::draw2DInfo() {
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 3);
 	glPopMatrix();
 
-	// 사용자가 지도 클릭한 위치 표시
+	// Click (Touch) position.
 	glPushMatrix();
 	glLineWidth(5.0f);
 	glVertexPointer(2, GL_FLOAT, 0, selectPosition);
@@ -280,21 +210,10 @@ void oglFunctions::draw2DInfo() {
 }
 
 void oglFunctions::drawPicking3DWorld() { 
-	/************************************************************************/
-	/* 지도의 좌표나 Object 의 선택을 파악하기 위한 함수                    */
-	/*
-	 Object 마다 아래와 같이 색을 지정한다.
-	 glColor4f((m_drawPickingCount/(256*256))/255.0f, ((m_drawPickingCount%(256*256))/256)/255.0f,(m_drawPickingCount%256)/255.0f, 1.0f);
-	 색 지정 후 m_drawPickingCount 값을 1씩 증가시켜 Object 를 구분한다.
-	 */
-	/************************************************************************/
 	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	if(m_VC->getEyeDistance3D(CURRENT_VIEW) > LIMIT_GLOBE_LINE)
-		return;
-
-	m_drawPickingCount = 1; // 0 은 기본색이다. 따라서 1로 시작
+	m_drawPickingCount = 1; // start 1.
 
 	glEnable(GL_DEPTH_TEST);
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -304,7 +223,7 @@ void oglFunctions::drawPicking3DWorld() {
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	
 	// 2D map
-	// 클릭지점 좌표를 파악하기 위한 그리드
+	// Calc Click(Touch) Position.
 	OBJINFO insertInfo;
 	m_objectInfo.clear();
 	float gridGap = m_VC->getEyeDistance3D(CURRENT_VIEW) / MAP_GRIDGAP;
@@ -340,7 +259,7 @@ void oglFunctions::drawPicking3DWorld() {
 
 	glVertexPointer(3, GL_FLOAT, 0, cubeVertices);
 
-	// 그리기
+	// Draw
 	glPushMatrix();
 	glTranslatef(340, -170, 0);
  	glColor4f((m_drawPickingCount/(256*256))/255.0f, ((m_drawPickingCount%(256*256))/256)/255.0f,(m_drawPickingCount%256)/255.0f, 1.0f);
@@ -479,14 +398,6 @@ void oglFunctions::drawPicking3DWorld() {
 }
 
 void oglFunctions::drawPicking2DInfo() { 
-	/************************************************************************/
-	/* Object 의 선택을 파악하기 위한 함수									*/
-	/* POI 등의 선택을 파악하기 위한 함수									*/
-	/* 2D 로 보이기 위한 각도 계산											*/
-	/************************************************************************/
-
-	if(m_VC->getEyeDistance3D(CURRENT_VIEW) > LIMIT_GLOBE_LINE)
-		return;
 
 	OBJINFO insertInfo;
 
@@ -567,7 +478,7 @@ unsigned int oglFunctions::getObjInfo(int sx, int sy, unsigned int objID, GLfloa
 				m_targetY = my = gridIdx->y;
 				m_targetZ = gridIdx->z;
 
-				// 클릭하면 지도 이동
+				// move click position
 				m_VC->setViewCenter(TARGET_VIEW, m_targetX, m_targetY);
 
 				break;
