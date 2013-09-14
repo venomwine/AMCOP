@@ -3,4 +3,24 @@
     <string name="app_name">AMCOP</string>
     <string name="menu_settings">Settings</string>
 	<string name="title_activity_main">AMCOP</string>
+
+	<string name="Info_Title">Program Information</string>
+	<string name="Info_AppVer">1.0.0</string>
+	<string name="Info_AppInfo">Android NDK(Native Activity)/MFC Cross-platform OpenGL Project (AMCOP).\n
+	    The same engine can operate in Android(NDK) and Windows(MFC).\n
+		Forget the difficult and complex ndk debugger. Use powerful visual studio debugger.\n
+		\n
+		\n
+		One finger : Map Moving.\n
+		Two fingers : Zoom In / Out.\n
+		Three fingers : Change Tilt and Rotate Angle.\n
+	</string>
+	<string name="Info_AppInfo2">
+	    AMCOP is Open Source Project.\n
+		https://github.com/venomwine/AMCOP\n
+	</string>    
+	<string name="Info_Producer">Producer</string>
+	<string name="Info_Producer_Name">HONG WOORAM</string>
+	<string name="Info_Producer_Mail">venomwine@gmail.com</string>
+	
 </resources>

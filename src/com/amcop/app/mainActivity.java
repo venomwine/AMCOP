@@ -1,8 +1,11 @@
 package com.amcop.app;
 
+import com.amcop.app.Info;
+
 import android.app.AlertDialog;
 import android.app.NativeActivity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -73,9 +76,9 @@ public class mainActivity extends NativeActivity {
 	LinearLayout 	mainLayout;
 
 	// eye move button	
-	LinearLayout 	btnEyeMoveTopLayout;
-	PopupWindow 	btnEyeMoveTopPopUp;
-	Button 			btnEyeMoveTopBtn;
+	LinearLayout 	btnInfoLayout;
+	PopupWindow 	btnInfoPopUp;
+	Button 			btnInfoBtn;
 	
 	// center move button (view target)	
 	LinearLayout 	btnCenterMoveTopLayout;
@@ -124,7 +127,7 @@ public class mainActivity extends NativeActivity {
 		// TODO Auto-generated method stub
 		super.onDestroy();
 				
-		btnEyeMoveTopPopUp.dismiss();
+		btnInfoPopUp.dismiss();
 		btnCenterMoveTopPopUp.dismiss();
 	
 		btnZoomInPopUp.dismiss();
@@ -222,11 +225,11 @@ public class mainActivity extends NativeActivity {
 		mActivity.runOnUiThread(new Runnable() {
 
 			public void run() {				
-				btnEyeMoveTopPopUp.showAtLocation(mainLayout, Gravity.TOP|Gravity.RIGHT, 0, 50);
+				btnInfoPopUp.showAtLocation(mainLayout, Gravity.TOP|Gravity.RIGHT, 0, 50);
 				btnCenterMoveTopPopUp.showAtLocation(mainLayout, Gravity.TOP|Gravity.LEFT, 0, 50);
 			
-				btnZoomInPopUp.showAtLocation(mainLayout, Gravity.BOTTOM|Gravity.LEFT, 0, 0);
-				btnZoomOutPopUp.showAtLocation(mainLayout, Gravity.BOTTOM|Gravity.LEFT, 0, 100);
+				btnZoomInPopUp.showAtLocation(mainLayout, Gravity.BOTTOM|Gravity.LEFT, 100, 0);
+				btnZoomOutPopUp.showAtLocation(mainLayout, Gravity.BOTTOM|Gravity.LEFT, 0, 0);
 			}
 		});
 	}
@@ -261,35 +264,37 @@ public class mainActivity extends NativeActivity {
 		mainLayout = new LinearLayout(this);
 		
 		/*
-		 * eye move buttons
+		 * info buttons
 		 */
-		// eye move top button
-		btnEyeMoveTopBtn = new Button(this);
-		btnEyeMoveTopBtn.setBackgroundResource(R.drawable.map_current_view_button);
-		btnEyeMoveTopBtn.setOnClickListener(new OnClickListener() {
+		// info button
+		btnInfoBtn = new Button(this);
+		btnInfoBtn.setBackgroundResource(R.drawable.info_button);
+		btnInfoBtn.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				pushEvent(pushEventType.PET_VIEW_SET_EYE_TOP.value(), 0, 0, null);
+				Intent intent = new Intent(mainActivity.this,
+						Info.class);
+				startActivity(intent);
 			}
 		});
 				
-		btnEyeMoveTopLayout = new LinearLayout(this);
-		btnEyeMoveTopLayout.setBackgroundColor(Color.TRANSPARENT);
-		btnEyeMoveTopLayout.setOrientation(LinearLayout.VERTICAL);
-		btnEyeMoveTopLayout.addView(btnEyeMoveTopBtn, new MarginLayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+		btnInfoLayout = new LinearLayout(this);
+		btnInfoLayout.setBackgroundColor(Color.TRANSPARENT);
+		btnInfoLayout.setOrientation(LinearLayout.VERTICAL);
+		btnInfoLayout.addView(btnInfoBtn, new MarginLayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
 
-		btnEyeMoveTopPopUp = new PopupWindow(btnEyeMoveTopLayout, 100, 100);
+		btnInfoPopUp = new PopupWindow(btnInfoLayout, 100, 100);
 		
 		/*
 		 * center move buttons (view target)
 		 */
 		// Center move top button
 		btnCenterMoveTop = new Button(this);
-		btnCenterMoveTop.setBackgroundResource(R.drawable.map_current_view_button);
+		btnCenterMoveTop.setBackgroundResource(R.drawable.map_center_button);
 		btnCenterMoveTop.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				pushEvent(pushEventType.PET_VIEW_SET_CENTER.value(), 0, 0, null);
+				pushEvent(pushEventType.PET_VIEW_SET_EYE_TOP.value(), 0, 0, null);
 			}
 		});
 				
@@ -302,7 +307,7 @@ public class mainActivity extends NativeActivity {
 		
 		// zoom in button
 		btnZoomIn = new Button(this);
-		btnZoomIn.setBackgroundResource(R.drawable.map_current_view_button);
+		btnZoomIn.setBackgroundResource(R.drawable.map_plus_button);
 		btnZoomIn.setOnTouchListener(new OnTouchListener() {
 			public boolean onTouch(View v, MotionEvent event) {
 				// TODO Auto-generated method stub
@@ -325,7 +330,7 @@ public class mainActivity extends NativeActivity {
 		
 		// zoom out button
 		btnZoomOut = new Button(this);
-		btnZoomOut.setBackgroundResource(R.drawable.map_current_view_button);
+		btnZoomOut.setBackgroundResource(R.drawable.map_minus_button);
 		btnZoomOut.setOnTouchListener(new OnTouchListener() {
 			public boolean onTouch(View v, MotionEvent event) {
 				// TODO Auto-generated method stub
