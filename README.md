@@ -23,6 +23,7 @@ Forget the difficult and complex ndk debugger. Use powerful visual studio debugg
 
 - Wooram, Hong
 - https://github.com/venomwine/AMCOP
+- https://play.google.com/store/apps/details?id=com.amcop.app
 - venomwine@gmail.com 
  
 ## License
