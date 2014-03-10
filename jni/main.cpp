@@ -531,7 +531,7 @@ jint setSdcardPath(JNIEnv* env, jclass clazz, jstring sdcardPath)
 }
 
 /*
- * JNI Function ?� ?�곳???�록?�여 ?�용.
+ * JNI Function
  */
 static JNINativeMethod wrMethods[] = {
 	/* name, signature, funcPtr */

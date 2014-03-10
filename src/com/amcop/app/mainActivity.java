@@ -60,7 +60,8 @@ public class mainActivity extends NativeActivity {
 	};
 
 	public native static int pushEvent(int type, int wParam, int lParam, Object obj);
-    public static native int setAssetManager(Object assetManager);  
+    public native static int setAssetManager(Object assetManager);
+    public native static int setSdcardPath(String sdPath);
     
 	private static final int INTERVAL = 16;
 	private Handler handler = new Handler();
